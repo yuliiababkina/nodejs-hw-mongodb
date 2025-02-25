@@ -20,36 +20,71 @@ export const setupServer = () => {
 
   app.use(cors());
 
-  app.get('/contacts', async (req, res) => {
-    const contacts = await getAllContacts();
-
-    res.status(200).json({
-      status: 200,
-      message: 'Successfully found contacts!',
-      data: contacts,
+  app.use((req, res, next) => {
+    req.log.info({
+      time: new Date().toLocaleString(),
+      url: req.url,
+      method: req.method,
+      ip: req.ip,
     });
+    next();
+  });
+
+  app.get('/contacts', async (req, res) => {
+    try {
+      const contacts = await getAllContacts();
+
+      res.status(200).json({
+        status: 200,
+        message: 'Successfully found contacts!',
+        data: contacts,
+      });
+    } catch (e) {
+      res.status(500).json({
+        message: `Error fetching contacts: ${e.message}`,
+      });
+    }
   });
 
   app.get('/contacts/:contactId', async (req, res) => {
     const { contactId } = req.params;
-    const contact = await getContactById(contactId);
 
-    if (!contact) {
-      res.status(404).json({
-        message: 'Contact not found',
+    if (!contactId) {
+      return res.status(400).json({
+        message: 'Contact ID is required',
       });
     }
 
-    res.status(200).json({
-      status: 200,
-      message: 'Successfully found contact with id {contactId}!',
-      data: contact,
-    });
+    try {
+      const contact = await getContactById(contactId);
+
+      if (!contact) {
+        return res.status(404).json({
+          message: 'Contact not found',
+        });
+      }
+
+      res.status(200).json({
+        status: 200,
+        message: `Successfully found contact with id ${contactId}!`,
+        data: contact,
+      });
+    } catch (e) {
+      res.status(500).json({
+        message: `Error fetching contact: ${e.message}`,
+      });
+    }
   });
 
   app.use('*', (req, res) => {
     res.status(404).json({
       message: 'Not found',
+    });
+  });
+
+  app.use((err, req, res, next) => {
+    res.status(500).json({
+      message: 'Something went wrong!',
     });
   });
 
