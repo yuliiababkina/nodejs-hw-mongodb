@@ -49,12 +49,6 @@ export const setupServer = () => {
   app.get('/contacts/:contactId', async (req, res) => {
     const { contactId } = req.params;
 
-    if (!contactId) {
-      return res.status(400).json({
-        message: 'Contact ID is required',
-      });
-    }
-
     try {
       const contact = await getContactById(contactId);
 
