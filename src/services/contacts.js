@@ -1,16 +1,36 @@
+// import createHttpError from 'http-errors';
+import { SORT_ORDER } from '../constants/index.js';
 import { contactsCollection } from '../db/models/contact.js';
 import { calculatePaginationData } from '../utils/calculatePaginationData.js';
 
-export const getAllContacts = async ({ page, perPage }) => {
+export const getAllContacts = async ({
+  page,
+  perPage,
+  sortOrder = SORT_ORDER.ASC,
+  sortBy,
+  filter = {},
+}) => {
   const limit = perPage;
   const skip = (page - 1) * perPage;
 
-  const totalContactsCount = await contactsCollection.countDocuments();
+  const contactQuery = contactsCollection.find();
 
-  const contacts = await contactsCollection
+  if (filter.type) {
+    contactQuery.where('contactType').equals(filter.type);
+  }
+  if (filter.isFavourite) {
+    contactQuery.where('isFavourite').equals(filter.isFavourite);
+  }
+
+  const totalContactsCount = await contactsCollection
     .find()
+    .merge(contactQuery)
+    .countDocuments();
+
+  const contacts = await contactQuery
     .limit(limit)
     .skip(skip)
+    .sort({ [sortBy]: sortOrder })
     .exec();
 
   const paginationData = calculatePaginationData(
