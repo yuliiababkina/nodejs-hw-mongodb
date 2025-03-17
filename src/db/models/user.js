@@ -1,4 +1,5 @@
 import { model, Schema } from 'mongoose';
+import { EMAIL_REGEXP } from '../../constants/index.js';
 
 const userSchema = new Schema(
   {
@@ -10,10 +11,7 @@ const userSchema = new Schema(
       type: String,
       require: true,
       unique: true,
-      match: [
-        /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-        'Please enter a valid email address',
-      ],
+      match: EMAIL_REGEXP,
     },
     password: { type: String, require: true },
   },
