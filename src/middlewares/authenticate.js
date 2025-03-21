@@ -10,11 +10,15 @@ export const authenticate = async (req, res, next) => {
     return;
   }
 
-  const bearer = authHeader.split(' ')[0];
-  const token = authHeader.split(' ')[1];
+  const [bearer, token] = authHeader.split(' ');
 
-  if (bearer !== 'Bearer' || !token) {
+  if (bearer !== 'Bearer') {
     next(createHttpError(401, 'Auth header should be of type Bearer'));
+    return;
+  }
+
+  if (!token) {
+    next(createHttpError(401, 'Access token is not provided'));
     return;
   }
 
@@ -25,17 +29,15 @@ export const authenticate = async (req, res, next) => {
     return;
   }
 
-  const isAccessTokenExpired =
-    new Date() > new Date(session.accessTokenValidUntil);
-
-  if (isAccessTokenExpired) {
+  if (new Date() > new Date(session.accessTokenValidUntil)) {
     next(createHttpError(401, 'Access token expired'));
   }
 
   const user = await usersCollection.findById(session.userId);
 
   if (!user) {
-    next(createHttpError(401));
+    await sessionsCollection.findByIdAndDelete(session._id);
+    next(createHttpError(401, 'Session user is not found'));
     return;
   }
 
