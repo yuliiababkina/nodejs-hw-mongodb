@@ -16,6 +16,7 @@ export const setupServer = () => {
 
   app.use(
     pino({
+      level: 'silent',
       transport: {
         target: 'pino-pretty',
       },
