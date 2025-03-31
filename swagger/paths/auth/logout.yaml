@@ -1,0 +1,13 @@
+tags:
+  - Auth
+summary: Log out an user
+operationId: logoutUser
+description: 'Logout an user'
+security: []
+responses:
+  '204':
+    description: No Content
+  '401':
+    $ref: ../../components/responses/401.yaml
+  '404':
+    $ref: ../../components/responses/404.yaml
