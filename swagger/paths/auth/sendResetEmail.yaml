@@ -35,6 +35,8 @@ responses:
               type: string
               example: 'An email to reset a password successfully sent!'
             data: {}
+  '400':
+    $ref: '../../components/responses/400.yaml'
   '401':
     $ref: '../../components/responses/401.yaml'
   '404':

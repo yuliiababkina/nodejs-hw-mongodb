@@ -41,7 +41,7 @@ requestBody:
             format: binary
             example: https://res.cloudinary.com/uqwgdu/image/upload/image.png
 responses:
-  '200':
+  '201':
     description: Creates a contact
     content:
       application/json:
@@ -54,14 +54,14 @@ responses:
           properties:
             status:
               type: integer
-              example: 200
+              example: 201
             message:
               type: string
               example: Successfully created a contact!
             data:
               type: object
               $ref: ../../components/schemas/contact.yaml
+  '400':
+    $ref: '../../components/responses/400.yaml'
   '401':
     $ref: '../../components/responses/401.yaml'
-  '404':
-    $ref: '../../components/responses/404.yaml'
